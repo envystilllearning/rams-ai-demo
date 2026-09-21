@@ -1,26 +1,113 @@
 @import "tailwindcss";
 
+/* ============================================================
+   RAMS AI Demo — Design Tokens (PRD §20)
+   Clean corporate + construction accent:
+   primary dark navy, accent amber. Light + dark themes.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --surface-muted: #f1f5f9;
+
+  /* Primary — dark navy */
+  --primary: #0b1f3a;
+  --primary-hover: #122d4f;
+  --primary-foreground: #ffffff;
+
+  /* Accent — construction amber */
+  --accent: #f59e0b;
+  --accent-hover: #d97706;
+  --accent-foreground: #78350f;
+
+  /* Semantic */
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --info: #2563eb;
+  --info-soft: #dbeafe;
+
+  /* Neutrals */
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --ring: #0b1f3a;
+
+  /* Shape */
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+}
+
+.dark {
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+  --surface: #101a2c;
+  --surface-muted: #17233a;
+
+  --primary: #e2e8f0;
+  --primary-hover: #f8fafc;
+  --primary-foreground: #0b1f3a;
+
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-foreground: #78350f;
+
+  --success: #22c55e;
+  --success-soft: #14532d;
+  --warning: #f59e0b;
+  --warning-soft: #451a03;
+  --danger: #ef4444;
+  --danger-soft: #450a0a;
+  --info: #60a5fa;
+  --info-soft: #172554;
+
+  --muted: #94a3b8;
+  --border: #22304a;
+  --ring: #f59e0b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius: var(--radius);
+  --radius-lg: var(--radius-lg);
+  --font-sans: var(--font-inter);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible focus everywhere (PRD §41) */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
