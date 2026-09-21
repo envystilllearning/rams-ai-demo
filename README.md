@@ -72,7 +72,22 @@ _TBD (Phase 17)_
 
 ## Local Development
 
-_TBD (Phase 1)_
+```bash
+# Frontend (Next.js)
+cd frontend
+npm install
+npm run dev          # http://localhost:3000
+
+# Backend (FastAPI)
+cd backend
+python -m venv .venv
+.venv\Scripts\activate            # Windows (source .venv/bin/activate on Unix)
+pip install -r requirements.txt
+uvicorn app.main:app --reload     # http://localhost:8000 (docs at /docs)
+
+# Document worker + backend via Docker (PRD §33)
+docker compose up --build         # backend :8000, Gotenberg :3100
+```
 
 ### 1. Database setup
 

@@ -1,0 +1,26 @@
+# RAMS AI Demo — local development stack (PRD §33)
+# Backend + Gotenberg (DOCX -> PDF, PRD §13).
+# Frontend runs on Vercel / `npm run dev` (Dockerfile provided for parity).
+#
+# Usage: docker compose up --build
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Inside compose network Gotenberg is reachable by service name
+      GOTENBERG_URL: http://gotenberg:3000
+    depends_on:
+      - gotenberg
+    restart: unless-stopped
+
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    ports:
+      # Host 3100 -> container 3000 (matches .env.example for non-Docker backend)
+      - "3100:3000"
+    restart: unless-stopped
