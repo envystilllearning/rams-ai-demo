@@ -83,6 +83,14 @@ export function getRams(id: string) {
 }
 
 export async function downloadDocx(rams: Rams) {
+  return downloadDocument(rams, "docx");
+}
+
+export async function downloadPdf(rams: Rams) {
+  return downloadDocument(rams, "pdf");
+}
+
+async function downloadDocument(rams: Rams, kind: "docx" | "pdf") {
   const { createClient } = await import("@/lib/supabase/client");
   const supabase = createClient();
   const {
@@ -91,7 +99,7 @@ export async function downloadDocx(rams: Rams) {
   if (!session) throw new Error("Not authenticated");
 
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/rams/${rams.id}/documents/docx`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/rams/${rams.id}/documents/${kind}`,
     { headers: { Authorization: `Bearer ${session.access_token}` } }
   );
   if (!res.ok) {
@@ -103,7 +111,7 @@ export async function downloadDocx(rams: Rams) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `${rams.document_number ?? rams.id.slice(0, 8)}.docx`;
+  a.download = `${rams.document_number ?? rams.id.slice(0, 8)}.${kind}`;
   document.body.appendChild(a);
   a.click();
   a.remove();

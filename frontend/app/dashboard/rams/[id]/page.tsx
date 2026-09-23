@@ -4,7 +4,7 @@ import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Download, Sparkles } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { downloadDocx, getRams, type Rams } from "@/lib/rams";
+import { downloadDocx, downloadPdf, getRams, type Rams } from "@/lib/rams";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
@@ -97,11 +97,12 @@ export default function RamsDetailPage({
     }
   }
 
-  async function onDownload() {
+  async function onDownload(kind: "docx" | "pdf") {
     if (!rams || downloading) return;
     setDownloading(true);
     try {
-      await downloadDocx(rams);
+      if (kind === "docx") await downloadDocx(rams);
+      else await downloadPdf(rams);
     } catch (e) {
       toast({
         title: "Download failed",
@@ -232,13 +233,13 @@ export default function RamsDetailPage({
             <div className="mt-6">
               <h3 className="font-semibold">Downloads</h3>
               <div className="mt-3 flex flex-wrap gap-3">
-                <Button variant="primary" onClick={onDownload} loading={downloading}>
+                <Button variant="primary" onClick={() => onDownload("docx")} loading={downloading}>
                   <Download className="h-4 w-4" aria-hidden />
                   Download DOCX
                 </Button>
-                <Button variant="outline" disabled title="PDF arrives in the next phase">
+                <Button variant="primary" onClick={() => onDownload("pdf")} loading={downloading}>
                   <Download className="h-4 w-4" aria-hidden />
-                  Download PDF (soon)
+                  Download PDF
                 </Button>
               </div>
 
