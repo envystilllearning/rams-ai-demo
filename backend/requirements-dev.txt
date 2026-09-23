@@ -1,0 +1,8 @@
+-r requirements.txt
+
+# Dev / test only (not installed on Vercel)
+pytest>=8,<9
+pytest-cov>=5,<7
+pypdf>=5,<7
+ruff>=0.6
+black>=24
