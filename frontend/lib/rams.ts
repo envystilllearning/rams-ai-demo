@@ -90,6 +90,14 @@ export async function downloadPdf(rams: Rams) {
   return downloadDocument(rams, "pdf");
 }
 
+export async function downloadStored(rams: Rams, kind: "docx" | "pdf") {
+  const { url, filename } = await apiFetch<{ url: string; filename: string; expires_in: number }>(
+    `/api/rams/${rams.id}/documents/${kind}/download`
+  );
+  window.open(url, "_blank", "noopener");
+  return filename;
+}
+
 async function downloadDocument(rams: Rams, kind: "docx" | "pdf") {
   const { createClient } = await import("@/lib/supabase/client");
   const supabase = createClient();

@@ -81,6 +81,35 @@ def _patch_pipeline(monkeypatch, *, rams_row, entitled=True, active_job=None):
     monkeypatch.setattr(rams_mod, "RamsRepo", FakeRamsRepo)
     monkeypatch.setattr(gen_mod, "check_entitlement", lambda uid: entitled)
 
+    class FakeStorage:
+        uploaded: list = []
+        removed: list = []
+
+        @classmethod
+        def from_settings(cls):
+            return cls()
+
+        def upload(self, bucket, path, data, content_type):
+            assert len(data) > 1000
+            FakeStorage.uploaded.append(path)
+            return path
+
+        def create_signed_url(self, bucket, path, expires_in=3600):
+            return f"https://signed.example/{path}"
+
+        def remove(self, bucket, paths):
+            FakeStorage.removed.extend(paths)
+
+    FakeStorage.uploaded = []
+    FakeStorage.removed = []
+    monkeypatch.setattr(gen_mod, "StorageClient", FakeStorage)
+
+    class FakeProfilesRepo:
+        def get(self, uid):
+            return {"company_name": "Test Co", "full_name": "Tester"}
+
+    monkeypatch.setattr(gen_mod, "ProfilesRepo", FakeProfilesRepo)
+
     from app.core.deps import get_current_user
 
     app.dependency_overrides[get_current_user] = lambda: FakeUser()
@@ -100,12 +129,14 @@ def test_generate_success(monkeypatch) -> None:
         r = client.post("/api/rams/rams-1/generate")
         assert r.status_code == 200, r.text
         body = r.json()
-        assert body["status"] == "generated"
+        assert body["status"] == "ready"
         assert body["generated_hazards"] >= 1
         assert body["provider"] == "mock"
-        # RAMS persisted with generated content
-        assert store["rams"]["status"] == "generated"
+        # RAMS persisted with generated content + file paths
+        assert store["rams"]["status"] == "ready"
         assert store["rams"]["generated_data"]["project_summary"]
+        assert store["rams"]["docx_path"].endswith(".docx")
+        assert store["rams"]["pdf_path"].endswith(".pdf")
     finally:
         teardown_override()
 
@@ -144,6 +175,40 @@ def test_generate_blocks_duplicate(monkeypatch) -> None:
         r = client.post("/api/rams/rams-1/generate")
         assert r.status_code == 409
         assert r.json()["code"] == "GENERATION_IN_PROGRESS"
+    finally:
+        teardown_override()
+
+
+def test_generate_storage_failure_marks_failed(monkeypatch) -> None:
+    store = _patch_pipeline(
+        monkeypatch,
+        rams_row={"id": "rams-1", "input_data": FORM, "status": "draft"},
+    )
+    import app.services.generation as gen_mod
+    from app.integrations.storage import StorageError
+
+    class ExplodingStorage:
+        removed: list = []
+
+        @classmethod
+        def from_settings(cls):
+            return cls()
+
+        def upload(self, bucket, path, data, content_type):
+            raise StorageError("disk full (simulated)")
+
+        def remove(self, bucket, paths):
+            ExplodingStorage.removed.extend(paths)
+
+    ExplodingStorage.removed = []
+    monkeypatch.setattr(gen_mod, "StorageClient", ExplodingStorage)
+    try:
+        r = client.post("/api/rams/rams-1/generate")
+        assert r.status_code == 502
+        assert r.json()["code"] == "STORAGE_UPLOAD_FAILED"
+        assert store["rams"]["status"] == "failed"
+        # Nothing was uploaded, so nothing to clean — and no leaked paths
+        assert "docx_path" not in store["rams"] or not store["rams"].get("docx_path")
     finally:
         teardown_override()
 

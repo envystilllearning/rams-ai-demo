@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { apiFetch, type Profile } from "@/lib/api";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,8 @@ export default function CompanySettingsPage() {
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     apiFetch<Profile>("/api/profile")
@@ -42,6 +45,47 @@ export default function CompanySettingsPage() {
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
+  }
+
+  async function onLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "Logo too large", description: "Maximum 2 MB.", variant: "danger" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/profile/logo`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: form,
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.message || `Upload failed (${res.status})`);
+      }
+      const updated: Profile = await res.json();
+      setProfile(updated);
+      toast({ title: "Logo uploaded", variant: "success" });
+    } catch (err) {
+      toast({
+        title: "Upload failed",
+        description: err instanceof Error ? err.message : "Please try again.",
+        variant: "danger",
+      });
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   }
 
   async function onSave() {
@@ -183,9 +227,35 @@ export default function CompanySettingsPage() {
           </div>
 
           <Alert variant="info" title="Email & logo">
-            Email comes from your account and cannot be changed here. Logo
-            upload arrives with the storage phase.
+            Email comes from your account and cannot be changed here.
           </Alert>
+
+          <div>
+            <span className="mb-1.5 block text-sm font-medium">Company logo</span>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={onLogoChange}
+              aria-label="Upload company logo"
+            />
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => fileRef.current?.click()}
+                loading={uploading}
+                disabled={uploading}
+              >
+                <Upload className="h-4 w-4" aria-hidden />
+                {profile?.logo_path ? "Replace logo" : "Upload logo"}
+              </Button>
+              {profile?.logo_path && (
+                <span className="text-xs text-muted">Logo saved ✓</span>
+              )}
+            </div>
+            <p className="mt-1 text-xs text-muted">PNG, JPEG or WebP, max 2 MB.</p>
+          </div>
 
           <div className="flex justify-end gap-3 border-t border-border pt-4">
             <Button variant="accent" onClick={onSave} loading={saving} disabled={saving}>

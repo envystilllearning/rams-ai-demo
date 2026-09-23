@@ -101,8 +101,15 @@ export default function RamsDetailPage({
     if (!rams || downloading) return;
     setDownloading(true);
     try {
-      if (kind === "docx") await downloadDocx(rams);
-      else await downloadPdf(rams);
+      // Persistent signed URL when ready; on-the-fly build otherwise
+      if (rams.status === "ready") {
+        const { downloadStored } = await import("@/lib/rams");
+        await downloadStored(rams, kind);
+      } else if (kind === "docx") {
+        await downloadDocx(rams);
+      } else {
+        await downloadPdf(rams);
+      }
     } catch (e) {
       toast({
         title: "Download failed",

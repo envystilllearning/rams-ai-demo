@@ -13,6 +13,7 @@ import uuid
 from fastapi import APIRouter, HTTPException, Query
 
 from app.core.deps import UserAuth
+from app.integrations.storage import RAMS_DOCUMENTS_BUCKET, StorageClient
 from app.repositories.rams import RamsRepo
 from app.schemas.rams import RamsCreate, RamsListOut, RamsOut
 
@@ -69,6 +70,13 @@ async def get_rams(rams_id: str, user: UserAuth) -> RamsOut:
 @router.delete("/{rams_id}", status_code=204)
 async def delete_rams(rams_id: str, user: UserAuth) -> None:
     repo = RamsRepo()
+    existing = repo.get(user.id, rams_id)
+    if existing is None:
+        raise HTTPException(status_code=404, detail="RAMS not found")
     deleted = repo.delete(user.id, rams_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="RAMS not found")
+    # Best-effort: remove persistent files so no orphans remain
+    paths = [p for p in (existing.get("docx_path"), existing.get("pdf_path")) if p]
+    if paths:
+        StorageClient.from_settings().remove(RAMS_DOCUMENTS_BUCKET, paths)
