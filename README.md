@@ -202,10 +202,20 @@ router level via fakes instead.
 
 ## Deployment
 
-Docker files are included (`frontend/Dockerfile`, `backend/Dockerfile`,
-`docker-compose.yml` with optional Gotenberg). Deployment itself (Vercel +
-a Python host) is out of scope for this demo iteration — see
-"Known Limitations".
+Live demo (mock providers — no external keys needed at runtime):
+
+- **Frontend**: https://frontend-fawn-delta-48.vercel.app
+- **Backend**: https://backend-tau-teal-73.vercel.app (`/health`)
+
+Both deploy from this repo via Vercel CLI (`vercel --prod` from
+`frontend/` and `backend/`). The backend runs serverless via
+`backend/api/index.py`; env vars are set per-project in Vercel
+(`SUPABASE_*`, `NEXT_PUBLIC_*`, `FRONTEND_URL`/`BACKEND_CORS_ORIGINS`).
+Note: deployment-specific `*.vercel.app` URLs sit behind Vercel
+Authentication — use the production aliases above.
+
+Docker files are also included (`frontend/Dockerfile`,
+`backend/Dockerfile`, `docker-compose.yml` with optional Gotenberg).
 
 ## Security
 
@@ -243,6 +253,8 @@ a Python host) is out of scope for this demo iteration — see
 - No email notifications (Resend), no revision history, single-user companies.
 - Direct Postgres (5432) unreachable from IPv6-less networks — use the pooler
   or REST; the app itself only needs REST + Storage HTTP APIs.
+- Vercel Hobby runs the API serverless (in-memory rate limiter is
+  per-instance) with cold starts on first request.
 
 ## Future Improvements
 
