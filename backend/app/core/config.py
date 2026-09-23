@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # Subscription policy (PRD §4): past_due configurable, default No
     subscription_allow_past_due: bool = False
 
+    # Payment provider: "mock" (demo, no Stripe keys needed) or "stripe"
+    payment_provider: str = "mock"
+
     @property
     def cors_origins(self) -> list[str]:
         return [o.strip() for o in self.backend_cors_origins.split(",") if o.strip()]
