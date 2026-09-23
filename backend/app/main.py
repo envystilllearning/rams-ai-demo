@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
-from app.routers import billing, health, profile
+from app.routers import billing, health, profile, rams
 
 settings = get_settings()
 
@@ -23,3 +23,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(profile.router)
 app.include_router(billing.router)
+app.include_router(rams.router)

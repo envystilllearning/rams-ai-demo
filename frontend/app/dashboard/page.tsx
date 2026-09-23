@@ -119,15 +119,22 @@ export default function DashboardPage() {
         <Card>
           <CardContent>
             <CardTitle>RAMS</CardTitle>
-            <CardDescription>Creation arrives in the next phase.</CardDescription>
-            <button
-              disabled
-              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground opacity-50"
-              title="Coming in the RAMS phase"
-            >
-              <FilePlus2 className="h-3.5 w-3.5" aria-hidden />
-              Create New RAMS
-            </button>
+            <CardDescription>Risk assessments & method statements.</CardDescription>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link
+                href="/dashboard/rams/new"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent-hover"
+              >
+                <FilePlus2 className="h-3.5 w-3.5" aria-hidden />
+                Create New RAMS
+              </Link>
+              <Link
+                href="/dashboard/rams"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-surface-muted"
+              >
+                View all
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
