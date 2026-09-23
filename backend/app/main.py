@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
-from app.routers import billing, health, profile, rams
+from app.core.errors import ApiError, api_error_handler, unhandled_error_handler
+from app.routers import billing, generation, health, profile, rams
 
 settings = get_settings()
 
@@ -24,3 +25,7 @@ app.include_router(health.router)
 app.include_router(profile.router)
 app.include_router(billing.router)
 app.include_router(rams.router)
+app.include_router(generation.router)
+
+app.add_exception_handler(ApiError, api_error_handler)
+app.add_exception_handler(Exception, unhandled_error_handler)

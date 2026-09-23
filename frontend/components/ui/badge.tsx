@@ -38,6 +38,7 @@ const statusMap: Record<string, BadgeVariant> = {
   // RAMS statuses
   draft: "neutral",
   generating: "info",
+  generated: "info",
   ready: "success",
   failed: "danger",
   // Subscription statuses (PRD §4)

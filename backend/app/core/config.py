@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     openrouter_model: str = "openai/gpt-4o-mini"
 
+    # AI provider: "mock" (demo, deterministic) or "openrouter"
+    ai_provider: str = "mock"
+
     # Document worker (Gotenberg, PRD §13)
     gotenberg_url: str = "http://localhost:3100"
 
