@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "backend.api.index:app"
+entrypoint = "api.index:app"
 
 [tool.ruff]
 line-length = 100
