@@ -64,8 +64,7 @@ def build_rams_docx(
     meta = doc.add_paragraph()
     meta.alignment = WD_ALIGN_PARAGRAPH.CENTER
     meta.add_run(
-        f"Document: {document_number}   |   Revision: 01\n"
-        f"{profile.get('company_name') or ''}"
+        f"Document: {document_number}   |   Revision: 01\n" f"{profile.get('company_name') or ''}"
     )
     doc.add_page_break()
 

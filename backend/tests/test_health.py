@@ -18,9 +18,7 @@ def test_profile_requires_auth() -> None:
 
 
 def test_profile_rejects_invalid_token() -> None:
-    response = client.get(
-        "/api/profile", headers={"Authorization": "Bearer not-a-real-token"}
-    )
+    response = client.get("/api/profile", headers={"Authorization": "Bearer not-a-real-token"})
     assert response.status_code == 401
 
 

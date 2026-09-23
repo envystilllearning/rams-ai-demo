@@ -85,9 +85,7 @@ async def upload_logo(
 
     path = f"{user.id}/logo.{ext}"
     try:
-        StorageClient.from_settings().upload(
-            COMPANY_ASSETS_BUCKET, path, data, mime
-        )
+        StorageClient.from_settings().upload(COMPANY_ASSETS_BUCKET, path, data, mime)
     except StorageError as exc:
         raise ApiError(502, "STORAGE_UPLOAD_FAILED", "Logo upload failed.") from exc
 

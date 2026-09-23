@@ -34,7 +34,9 @@ def _mock_hazards(form_input: dict[str, Any]) -> list[dict[str, Any]]:
     first_hint = known.split(".")[0].strip() if known else ""
     work = (form_input.get("work_description") or "the works")[:80]
 
-    def hazard_row(hazard: str, who: str, controls: str, il: int, is_: int, rl: int, rs: int, extra: str) -> dict:
+    def hazard_row(
+        hazard: str, who: str, controls: str, il: int, is_: int, rl: int, rs: int, extra: str
+    ) -> dict:
         return {
             "hazard": hazard,
             "who_might_be_harmed": who,
@@ -53,21 +55,30 @@ def _mock_hazards(form_input: dict[str, Any]) -> list[dict[str, Any]]:
             first_hint or f"Manual handling during {work}",
             "Site operatives and labourers",
             "Manual handling assessment completed; team lifts for loads over 20kg",
-            3, 3, 2, 2,
+            3,
+            3,
+            2,
+            2,
             "Use mechanical aids where practicable; toolbox talk on lifting technique",
         ),
         hazard_row(
             "Slips, trips and falls on site",
             "All persons on site and visitors",
             "Walkways kept clear; cables ramped or buried; good housekeeping",
-            3, 2, 2, 1,
+            3,
+            2,
+            2,
+            1,
             "Daily housekeeping checks by supervisor; report defects immediately",
         ),
         hazard_row(
             "Working with hand and power tools",
             "Operatives using the tools",
             "Tools PAT tested; guards in place; competent operators only",
-            2, 3, 1, 3,
+            2,
+            3,
+            1,
+            3,
             "Pre-use checks recorded; isolate and lock off when changing blades/bits",
         ),
     ]
@@ -82,7 +93,10 @@ class MockAiProvider(AiProvider):
         location = form_input.get("work_location") or "the work area"
         project = form_input.get("project_name") or "the project"
         emergency = form_input.get("emergency_info") or ""
-        ppe_raw = form_input.get("ppe") or "Safety helmet, hi-vis vest, safety boots, gloves, eye protection"
+        ppe_raw = (
+            form_input.get("ppe")
+            or "Safety helmet, hi-vis vest, safety boots, gloves, eye protection"
+        )
 
         ppe = [p.strip() for p in str(ppe_raw).replace(";", ",").split(",") if p.strip()][:20] or [
             "Safety helmet",

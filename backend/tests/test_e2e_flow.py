@@ -93,7 +93,12 @@ def install_fakes(monkeypatch, store: Store):
 
     class FakeProfilesRepo:
         def get(self, uid):
-            return {"id": uid, "email": EMAIL, "company_name": "E2E Builders Ltd", "full_name": "E2E Tester"}
+            return {
+                "id": uid,
+                "email": EMAIL,
+                "company_name": "E2E Builders Ltd",
+                "full_name": "E2E Tester",
+            }
 
         def upsert(self, uid, email, data):
             return {"id": uid, "email": email, **data}

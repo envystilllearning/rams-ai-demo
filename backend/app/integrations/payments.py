@@ -71,9 +71,7 @@ class StripeProvider(PaymentProvider):
         row = repo.get(user_id)
         customer_id = row.get("stripe_customer_id") if row else None
         if not customer_id:
-            customer = stripe.Customer.create(
-                email=email, metadata={"user_id": user_id}
-            )
+            customer = stripe.Customer.create(email=email, metadata={"user_id": user_id})
             customer_id = customer.id
             repo.upsert(user_id, {"stripe_customer_id": customer_id})
 

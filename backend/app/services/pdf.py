@@ -29,11 +29,19 @@ LIGHT_GREY = colors.HexColor("#F1F5F9")
 
 def _styles():
     ss = getSampleStyleSheet()
-    title = ParagraphStyle("RamsTitle", parent=ss["Title"], textColor=NAVY, fontSize=22, spaceAfter=6)
-    h1 = ParagraphStyle("RamsH1", parent=ss["Heading1"], textColor=NAVY, fontSize=14, spaceBefore=14, spaceAfter=6)
-    h2 = ParagraphStyle("RamsH2", parent=ss["Heading2"], textColor=NAVY, fontSize=11, spaceBefore=10, spaceAfter=4)
+    title = ParagraphStyle(
+        "RamsTitle", parent=ss["Title"], textColor=NAVY, fontSize=22, spaceAfter=6
+    )
+    h1 = ParagraphStyle(
+        "RamsH1", parent=ss["Heading1"], textColor=NAVY, fontSize=14, spaceBefore=14, spaceAfter=6
+    )
+    h2 = ParagraphStyle(
+        "RamsH2", parent=ss["Heading2"], textColor=NAVY, fontSize=11, spaceBefore=10, spaceAfter=4
+    )
     body = ParagraphStyle("RamsBody", parent=ss["BodyText"], fontSize=9.5, leading=13.5)
-    small = ParagraphStyle("RamsSmall", parent=ss["BodyText"], fontSize=8.5, leading=11.5, textColor=GREY)
+    small = ParagraphStyle(
+        "RamsSmall", parent=ss["BodyText"], fontSize=8.5, leading=11.5, textColor=GREY
+    )
     center = ParagraphStyle("RamsCenter", parent=body, alignment=1)
     return title, h1, h2, body, small, center
 
@@ -55,7 +63,10 @@ TABLE_STYLE = TableStyle(
 
 
 def _kv_table(body_style, pairs: list[tuple[str, Any]]) -> Table:
-    rows = [[Paragraph(f"<b>{k}</b>", body_style), Paragraph(str(v or "—"), body_style)] for k, v in pairs]
+    rows = [
+        [Paragraph(f"<b>{k}</b>", body_style), Paragraph(str(v or "—"), body_style)]
+        for k, v in pairs
+    ]
     t = Table(rows, colWidths=[5 * cm, 11 * cm])
     t.setStyle(TABLE_STYLE)
     return t
@@ -127,7 +138,12 @@ def build_rams_pdf(
     for item in generated.get("ppe") or []:
         story.append(P(f"•  {item}"))
     story.append(Paragraph("Plant and equipment", h1))
-    for key, label in (("plant", "Plant"), ("equipment", "Equipment"), ("tools", "Tools"), ("materials", "Materials")):
+    for key, label in (
+        ("plant", "Plant"),
+        ("equipment", "Equipment"),
+        ("tools", "Tools"),
+        ("materials", "Materials"),
+    ):
         if form_input.get(key):
             story.append(P(f"<b>{label}:</b> {form_input[key]}"))
 
@@ -144,8 +160,13 @@ def build_rams_pdf(
         ]
         for h in hazards
     ]
-    header = [Paragraph(f"<b>{h}</b>", body) for h in ["Hazard / who harmed", "L", "S", "Risk", "Residual"]]
-    risk_table = Table([header, *risk_rows], colWidths=[8 * cm, 1.5 * cm, 1.5 * cm, 2 * cm, 2.5 * cm])
+    header = [
+        Paragraph(f"<b>{h}</b>", body)
+        for h in ["Hazard / who harmed", "L", "S", "Risk", "Residual"]
+    ]
+    risk_table = Table(
+        [header, *risk_rows], colWidths=[8 * cm, 1.5 * cm, 1.5 * cm, 2 * cm, 2.5 * cm]
+    )
     risk_table.setStyle(TABLE_STYLE)
     risk_table.repeatRows = 1
     story.append(risk_table)
@@ -158,7 +179,11 @@ def build_rams_pdf(
     # --- Method statement ---
     story.append(Paragraph("Method statement", h1))
     ms = generated.get("method_statement") or {}
-    for key, label in (("preparation", "Preparation"), ("execution", "Execution"), ("completion", "Completion / handover")):
+    for key, label in (
+        ("preparation", "Preparation"),
+        ("execution", "Execution"),
+        ("completion", "Completion / handover"),
+    ):
         story.append(Paragraph(label, h2))
         story.append(P(ms.get(key)))
 
@@ -174,7 +199,12 @@ def build_rams_pdf(
     story.append(Spacer(1, 0.3 * cm))
     sign = Table(
         [
-            [Paragraph("<b>Role</b>", body), Paragraph("<b>Name</b>", body), Paragraph("<b>Signature</b>", body), Paragraph("<b>Date</b>", body)],
+            [
+                Paragraph("<b>Role</b>", body),
+                Paragraph("<b>Name</b>", body),
+                Paragraph("<b>Signature</b>", body),
+                Paragraph("<b>Date</b>", body),
+            ],
             [P("Prepared by"), P(""), P(""), P("")],
             [P("Reviewed by"), P(""), P(""), P("")],
             [P("Approved by"), P(""), P(""), P("")],

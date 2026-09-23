@@ -17,7 +17,9 @@ class RamsRepo:
             "Content-Type": "application/json",
         }
 
-    def list_for_user(self, user_id: str, limit: int = 50, offset: int = 0) -> tuple[list[dict], int]:
+    def list_for_user(
+        self, user_id: str, limit: int = 50, offset: int = 0
+    ) -> tuple[list[dict], int]:
         """Return (items, total) for the user, newest first."""
         with httpx.Client(timeout=15) as c:
             r = c.get(

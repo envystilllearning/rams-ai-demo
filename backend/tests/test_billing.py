@@ -78,7 +78,10 @@ def test_cancel_mock_cancels(monkeypatch) -> None:
     from app.repositories import subscriptions as sub_mod
 
     store: dict[str, dict] = {
-        "22222222-2222-2222-2222-222222222222": {"user_id": "22222222-2222-2222-2222-222222222222", "status": "active"}
+        "22222222-2222-2222-2222-222222222222": {
+            "user_id": "22222222-2222-2222-2222-222222222222",
+            "status": "active",
+        }
     }
 
     class FakeRepo:
