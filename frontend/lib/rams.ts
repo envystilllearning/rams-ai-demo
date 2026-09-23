@@ -82,6 +82,34 @@ export function getRams(id: string) {
   return apiFetch<Rams>(`/api/rams/${id}`);
 }
 
+export async function downloadDocx(rams: Rams) {
+  const { createClient } = await import("@/lib/supabase/client");
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session) throw new Error("Not authenticated");
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/rams/${rams.id}/documents/docx`,
+    { headers: { Authorization: `Bearer ${session.access_token}` } }
+  );
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.message || `Download failed (${res.status})`);
+  }
+
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${rams.document_number ?? rams.id.slice(0, 8)}.docx`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 export async function deleteRams(id: string) {
   const { createClient } = await import("@/lib/supabase/client");
   const supabase = createClient();

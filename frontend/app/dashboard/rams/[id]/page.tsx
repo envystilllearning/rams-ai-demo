@@ -2,9 +2,9 @@
 
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Download, Sparkles } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-import { getRams, type Rams } from "@/lib/rams";
+import { downloadDocx, getRams, type Rams } from "@/lib/rams";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/badge";
@@ -45,6 +45,7 @@ export default function RamsDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [stage, setStage] = useState(0);
   const [canGenerate, setCanGenerate] = useState<boolean | null>(null);
   const [genError, setGenError] = useState<string | null>(null);
@@ -93,6 +94,22 @@ export default function RamsDetailPage({
       toast({ title: "Generation failed", description: message, variant: "danger" });
     } finally {
       setGenerating(false);
+    }
+  }
+
+  async function onDownload() {
+    if (!rams || downloading) return;
+    setDownloading(true);
+    try {
+      await downloadDocx(rams);
+    } catch (e) {
+      toast({
+        title: "Download failed",
+        description: e instanceof Error ? e.message : "Please try again.",
+        variant: "danger",
+      });
+    } finally {
+      setDownloading(false);
     }
   }
 
@@ -213,7 +230,19 @@ export default function RamsDetailPage({
 
           {hazards.length > 0 && (
             <div className="mt-6">
-              <h3 className="font-semibold">Risk assessment ({hazards.length} hazards)</h3>
+              <h3 className="font-semibold">Downloads</h3>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <Button variant="primary" onClick={onDownload} loading={downloading}>
+                  <Download className="h-4 w-4" aria-hidden />
+                  Download DOCX
+                </Button>
+                <Button variant="outline" disabled title="PDF arrives in the next phase">
+                  <Download className="h-4 w-4" aria-hidden />
+                  Download PDF (soon)
+                </Button>
+              </div>
+
+              <h3 className="mt-6 font-semibold">Risk assessment ({hazards.length} hazards)</h3>
               <div className="mt-3 space-y-3">
                 {hazards.map((h, i) => (
                   <div key={i} className="rounded-lg border border-border p-4">
